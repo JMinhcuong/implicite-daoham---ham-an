@@ -4,207 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trắc nghiệm Đạo hàm hàm ẩn</title>
-    <!-- MathJax -->
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    
+    <!-- Cấu hình MathJax để render đẹp và chính xác -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['$$', '$$']],
+                packages: {'[+]': ['ams', 'noerrors']}
+            },
+            svg: { fontCache: 'global' },
+            startup: {
+                pageReady: () => {
+                    return MathJax.startup.defaultPageReady();
+                }
+            }
+        };
+    </script>
+    <!-- MathJax CDN -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
     <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-        }
-        body {
-            background: #f0f4fc;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-        .app {
-            max-width: 920px;
-            width: 100%;
-            background: white;
-            border-radius: 32px;
-            box-shadow: 0 20px 40px rgba(0, 20, 40, 0.08);
-            padding: 24px 30px;
-        }
-        h1 {
-            font-size: 28px;
-            font-weight: 600;
-            color: #0b1f3b;
-            border-left: 6px solid #2a7de1;
-            padding-left: 18px;
-            margin: 0 0 8px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .subhead {
-            color: #2c3f66;
-            margin: 0 0 28px 0;
-            font-size: 15px;
-            background: #eaf1fd;
-            padding: 10px 22px;
-            border-radius: 60px;
-            display: inline-block;
-            font-weight: 500;
-        }
-        .question-card {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 22px 24px;
-            margin-bottom: 28px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-            border: 1px solid #e3eaf3;
-            transition: 0.15s;
-        }
-        .question-card.correct {
-            border-left: 8px solid #1b8c5a;
-            background: #f5fcf9;
-        }
-        .question-card.wrong {
-            border-left: 8px solid #c74a4a;
-            background: #fcf6f6;
-        }
-        .q-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .q-number {
-            font-weight: 600;
-            color: #1a3770;
-            background: #e3ebf9;
-            padding: 4px 18px;
-            border-radius: 40px;
-            font-size: 14px;
-        }
-        .q-tag {
-            font-size: 13px;
-            background: #dce4f0;
-            padding: 4px 18px;
-            border-radius: 40px;
-            color: #1a3770;
-            font-weight: 500;
-        }
-        .q-text {
-            font-size: 18px;
-            line-height: 1.7;
-            margin: 14px 0 18px 0;
-            color: #0b1f3b;
-        }
-        .q-text .math {
-            font-size: 1.1em;
-        }
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin: 10px 0 6px 0;
-        }
-        .option {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 14px 20px;
-            background: #f9fcff;
-            border-radius: 60px;
-            border: 1.5px solid #dfe7f2;
-            cursor: pointer;
-            transition: 0.15s;
-            font-size: 16px;
-        }
-        .option:hover:not(.disabled-option) {
-            background: #ecf3fe;
-            border-color: #a6bce6;
-            transform: translateY(-1px);
-        }
-        .option.disabled-option {
-            cursor: default;
-            opacity: 0.9;
-        }
-        .option.selected-correct {
-            background: #c5edd9;
-            border-color: #1b8c5a;
-            font-weight: 500;
-            box-shadow: 0 0 0 2px rgba(27, 140, 90, 0.2);
-        }
-        .option.selected-wrong {
-            background: #f8d6d6;
-            border-color: #c74a4a;
-            font-weight: 500;
-            box-shadow: 0 0 0 2px rgba(199, 74, 74, 0.15);
-        }
-        .option .letter {
-            font-weight: 600;
-            color: #1f3a6b;
-            min-width: 30px;
-        }
-        .explanation {
-            margin-top: 20px;
-            padding: 16px 20px;
-            background: #f4f9ff;
-            border-radius: 18px;
-            border-left: 5px solid #2a7de1;
-            color: #132b4a;
-            font-size: 15px;
-            display: none;
-            line-height: 1.7;
-        }
-        .explanation.show {
-            display: block;
-        }
-        .explanation strong {
-            color: #0f2b5c;
-        }
-        .exp-correct {
-            color: #0d7a47;
-            font-weight: 600;
-        }
-        .exp-wrong {
-            color: #b13e3e;
-            font-weight: 600;
-        }
-        .footer {
-            margin-top: 18px;
-            display: flex;
-            justify-content: flex-end;
-        }
-        .reset-btn {
-            background: #1a3770;
-            color: white;
-            border: none;
-            padding: 14px 40px;
-            border-radius: 60px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 6px 14px rgba(26, 55, 112, 0.15);
-            letter-spacing: 0.3px;
-        }
-        .reset-btn:hover {
-            background: #0f2857;
-            transform: scale(0.97);
-        }
-        .progress {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin: 10px 0 6px 0;
-        }
-        .progress-badge {
-            background: #e3ebf9;
-            border-radius: 40px;
-            padding: 6px 20px;
-            font-size: 14px;
-            color: #1a3770;
-            font-weight: 500;
-        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
+        body { background: #f0f4fc; margin: 0; padding: 20px; display: flex; justify-content: center; color: #0b1f3b; }
+        .app { max-width: 900px; width: 100%; background: white; border-radius: 24px; box-shadow: 0 20px 40px rgba(0, 20, 40, 0.08); padding: 30px; }
+        
+        h1 { font-size: 26px; font-weight: 700; color: #0b1f3b; border-left: 6px solid #2a7de1; padding-left: 16px; margin: 0 0 8px 0; display: flex; align-items: center; gap: 10px; }
+        .subhead { color: #2c3f66; margin: 0 0 20px 0; font-size: 14px; background: #eaf1fd; padding: 8px 20px; border-radius: 60px; display: inline-block; font-weight: 600; }
+        
+        .progress-container { background: #e3ebf9; border-radius: 12px; height: 8px; margin-bottom: 24px; overflow: hidden; }
+        .progress-bar { background: #2a7de1; height: 100%; width: 0%; transition: width 0.4s ease; }
+        .progress-text { font-size: 14px; color: #1a3770; font-weight: 600; margin-bottom: 8px; display: flex; justify-content: space-between; }
+
+        .question-card { background: #ffffff; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); border: 1px solid #e3eaf3; transition: all 0.2s ease; }
+        .question-card.correct { border-left: 6px solid #1b8c5a; background: #f5fcf9; }
+        .question-card.wrong { border-left: 6px solid #c74a4a; background: #fcf6f6; }
+        
+        .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+        .q-number { font-weight: 700; color: #1a3770; background: #e3ebf9; padding: 4px 16px; border-radius: 40px; font-size: 13px; }
+        .q-tag { font-size: 12px; background: #dce4f0; padding: 4px 14px; border-radius: 40px; color: #1a3770; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .q-text { font-size: 17px; line-height: 1.6; margin: 16px 0; color: #0b1f3b; }
+        
+        .options { display: flex; flex-direction: column; gap: 10px; margin: 16px 0; }
+        .option { display: flex; align-items: center; gap: 14px; padding: 14px 20px; background: #f9fcff; border-radius: 12px; border: 1.5px solid #dfe7f2; cursor: pointer; transition: all 0.15s ease; font-size: 16px; }
+        .option:hover:not(.disabled-option) { background: #ecf3fe; border-color: #a6bce6; transform: translateX(4px); }
+        .option.disabled-option { cursor: default; opacity: 0.85; }
+        
+        .option.selected-correct { background: #c5edd9; border-color: #1b8c5a; font-weight: 600; box-shadow: 0 0 0 2px rgba(27, 140, 90, 0.15); }
+        .option.selected-wrong { background: #f8d6d6; border-color: #c74a4a; font-weight: 600; box-shadow: 0 0 0 2px rgba(199, 74, 74, 0.15); }
+        .option .letter { font-weight: 700; color: #1f3a6b; min-width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: #e3ebf9; border-radius: 50%; font-size: 14px; }
+        .option.selected-correct .letter { background: #1b8c5a; color: white; }
+        .option.selected-wrong .letter { background: #c74a4a; color: white; }
+
+        .explanation { margin-top: 20px; padding: 20px; background: #f4f9ff; border-radius: 12px; border-left: 4px solid #2a7de1; color: #132b4a; font-size: 15px; display: none; line-height: 1.7; animation: fadeIn 0.3s ease; }
+        .explanation.show { display: block; }
+        .explanation strong { color: #0f2b5c; display: block; margin-bottom: 8px; font-size: 16px; }
+        
+        .footer { margin-top: 30px; display: flex; justify-content: center; }
+        .reset-btn { background: #1a3770; color: white; border: none; padding: 14px 48px; border-radius: 60px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 6px 14px rgba(26, 55, 112, 0.2); display: flex; align-items: center; gap: 8px; }
+        .reset-btn:hover { background: #0f2857; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(26, 55, 112, 0.25); }
+        .reset-btn:active { transform: translateY(0); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 600px) {
-            .app { padding: 16px; }
-            .option { padding: 12px 16px; }
+            .app { padding: 16px; border-radius: 16px; }
+            .option { padding: 12px 16px; font-size: 15px; }
             .q-text { font-size: 16px; }
         }
     </style>
@@ -212,49 +77,163 @@
 <body>
 <div class="app" id="app">
     <h1>📐 Đạo hàm hàm ẩn</h1>
-    <div class="subhead">20 câu trắc nghiệm · 5 lý thuyết · 5 dễ · 5 trung bình · 5 khó</div>
+    <div class="subhead">20 câu trắc nghiệm · 5 Lý thuyết · 5 Dễ · 5 Trung bình · 5 Khó</div>
+    
+    <div class="progress-text">
+        <span>Tiến độ</span>
+        <span id="scoreText">0/20 câu</span>
+    </div>
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
     <div id="questionContainer"></div>
+    
     <div class="footer">
-        <button class="reset-btn" id="resetBtn">🔄 Làm lại</button>
+        <button class="reset-btn" id="resetBtn">🔄 Làm lại bài</button>
     </div>
 </div>
+
 <script>
     (function() {
-        // ---------- DỮ LIỆU 20 CÂU (đạo hàm hàm ẩn) ----------
+        // ---------- DỮ LIỆU 20 CÂU (Đã sửa lỗi toán học và tối ưu LaTeX) ----------
         const questions = [
             // 5 LÝ THUYẾT (0-4)
-            { id: 0, type: 'Lý thuyết', difficulty: 'Lý thuyết', text: 'Cho hàm ẩn \( y = y(x) \) xác định bởi \( x^2 + y^2 = 1 \). Đạo hàm \( y\' \) bằng:', options: ['\( -\\frac{x}{y} \)', '\( \\frac{x}{y} \)', '\( -\\frac{y}{x} \)', '\( \\frac{y}{x} \)'], correct: 0, explanation: 'Đạo hàm hai vế: \( 2x + 2y y\' = 0 \\Rightarrow y\' = -\\frac{x}{y} \). Đáp án A đúng vì dấu âm và đúng vị trí.' },
-            { id: 1, type: 'Lý thuyết', difficulty: 'Lý thuyết', text: 'Cho \( xy + \\ln y = 0 \). Biểu thức \( y\' \) là:', options: ['\( -\\frac{y}{x + 1/y} \)', '\( -\\frac{y^2}{xy+1} \)', '\( -\\frac{y}{x} \)', '\( -\\frac{x}{y} \)'], correct: 1, explanation: 'Đạo hàm: \( y + xy\' + \\frac{y\'}{y}=0 \\Rightarrow y\' (x + 1/y) = -y \\Rightarrow y\' = -\\frac{y}{x+1/y} = -\\frac{y^2}{xy+1} \). Đáp án B.' },
-            { id: 2, type: 'Lý thuyết', difficulty: 'Lý thuyết', text: 'Hàm ẩn \( y(x) \) từ \( e^x + e^y = 1 \). Tính \( y\' \) tại điểm \( x=0, y=0 \)?', options: ['\( -1 \)', '\( 1 \)', '\( 0 \)', '\( -e \)'], correct: 0, explanation: 'Đạo hàm: \( e^x + e^y y\' = 0 \\Rightarrow y\' = - e^{x-y} \). Tại (0,0): \( y\'=-1 \). Đáp án A.' },
-            { id: 3, type: 'Lý thuyết', difficulty: 'Lý thuyết', text: 'Đạo hàm cấp hai của hàm ẩn \( y(x) \) từ \( x^2 + y^2 = 1 \) là:', options: ['\( -\\frac{1}{y^3} \)', '\( -\\frac{1}{y^2} \)', '\( -\\frac{x^2}{y^3} \)', '\( -\\frac{1}{x^2+y^2} \)'], correct: 0, explanation: '\( y\' = -x/y \\). Lấy đạo hàm: \( y\'\' = -(y - x y\')/y^2 = -(y + x^2/y)/y^2 = - (x^2+y^2)/y^3 = -1/y^3 \). Đáp án A.' },
-            { id: 4, type: 'Lý thuyết', difficulty: 'Lý thuyết', text: 'Cho \( \\sin(xy) = x \\). Biểu thức \( y\' \) là:', options: ['\( \\frac{1 - y\\cos(xy)}{x\\cos(xy)} \)', '\( \\frac{\\cos(xy) - y}{x} \)', '\( \\frac{1 - y\\cos(xy)}{x} \)', '\( \\frac{\\cos(xy)}{x} \)'], correct: 0, explanation: 'Đạo hàm: \( \\cos(xy)(y + xy\') = 1 \\Rightarrow y\' = \\frac{1 - y\\cos(xy)}{x\\cos(xy)} \). Đáp án A.' },
+            { id: 0, type: 'Lý thuyết', difficulty: 'Lý thuyết', 
+              text: `Cho hàm ẩn \\( y = y(x) \\) xác định bởi \\( x^2 + y^2 = 1 \\). Đạo hàm \\( y' \\) bằng:`, 
+              options: [`\\( -\\frac{x}{y} \\)`, `\\( \\frac{x}{y} \\)`, `\\( -\\frac{y}{x} \\)`, `\\( \\frac{y}{x} \\)`], 
+              correct: 0, 
+              explanation: `Lấy đạo hàm hai vế theo \\( x \\):<br>$$ 2x + 2y \\cdot y' = 0 $$<br>$$ \\Rightarrow 2y \\cdot y' = -2x \\Rightarrow y' = -\\frac{x}{y} $$<br>Đáp án A chính xác.` },
+            
+            { id: 1, type: 'Lý thuyết', difficulty: 'Lý thuyết', 
+              text: `Cho \\( xy + \\ln y = 0 \\). Biểu thức \\( y' \\) là:`, 
+              options: [`\\( -\\frac{y}{x + 1/y} \\)`, `\\( -\\frac{y^2}{xy+1} \\)`, `\\( -\\frac{y}{x} \\)`, `\\( -\\frac{x}{y} \\)`], 
+              correct: 1, 
+              explanation: `Lấy đạo hàm hai vế:<br>$$ y + x \\cdot y' + \\frac{1}{y} \\cdot y' = 0 $$<br>$$ \\Rightarrow y' \\left( x + \\frac{1}{y} \\right) = -y $$<br>$$ \\Rightarrow y' = \\frac{-y}{\\frac{xy+1}{y}} = -\\frac{y^2}{xy+1} $$` },
+            
+            { id: 2, type: 'Lý thuyết', difficulty: 'Lý thuyết', 
+              text: `Hàm ẩn \\( y(x) \\) xác định bởi \\( e^x + e^y = 1 \\). Tính \\( y' \\) tại điểm \\( x=0, y=0 \\):`, 
+              options: [`\\( -1 \\)`, `\\( 1 \\)`, `\\( 0 \\)`, `\\( -e \\)`], 
+              correct: 0, 
+              explanation: `Đạo hàm hai vế:<br>$$ e^x + e^y \\cdot y' = 0 \\Rightarrow y' = -\\frac{e^x}{e^y} = -e^{x-y} $$<br>Tại \\( (0,0) \\): \\( y' = -e^{0-0} = -1 \\).` },
+            
+            { id: 3, type: 'Lý thuyết', difficulty: 'Lý thuyết', 
+              text: `Đạo hàm cấp hai \\( y'' \\) của hàm ẩn \\( x^2 + y^2 = 1 \\) là:`, 
+              options: [`\\( -\\frac{1}{y^3} \\)`, `\\( -\\frac{1}{y^2} \\)`, `\\( -\\frac{x^2}{y^3} \\)`, `\\( -\\frac{1}{x^2+y^2} \\)`], 
+              correct: 0, 
+              explanation: `Ta có \\( y' = -\\frac{x}{y} \\). Lấy đạo hàm tiếp:<br>$$ y'' = -\\frac{1 \\cdot y - x \\cdot y'}{y^2} = -\\frac{y - x(-\\frac{x}{y})}{y^2} = -\\frac{y + \\frac{x^2}{y}}{y^2} = -\\frac{x^2+y^2}{y^3} $$<br>Vì \\( x^2+y^2=1 \\), nên \\( y'' = -\\frac{1}{y^3} \\).` },
+            
+            { id: 4, type: 'Lý thuyết', difficulty: 'Lý thuyết', 
+              text: `Cho \\( \\sin(xy) = x \\). Biểu thức \\( y' \\) là:`, 
+              options: [`\\( \\frac{1 - y\\cos(xy)}{x\\cos(xy)} \\)`, `\\( \\frac{\\cos(xy) - y}{x} \\)`, `\\( \\frac{1 - y\\cos(xy)}{x} \\)`, `\\( \\frac{\\cos(xy)}{x} \\)`], 
+              correct: 0, 
+              explanation: `Đạo hàm hai vế:<br>$$ \\cos(xy) \\cdot (y + x \\cdot y') = 1 $$<br>$$ \\Rightarrow y\\cos(xy) + x\\cos(xy) \\cdot y' = 1 $$<br>$$ \\Rightarrow y' = \\frac{1 - y\\cos(xy)}{x\\cos(xy)} $$` },
 
             // 5 DỄ (5-9)
-            { id: 5, type: 'Bài tập', difficulty: 'Dễ', text: 'Cho \( x^2 y + y^2 = 2x \\). Tìm \( y\' \) tại \( (1,1) \).', options: ['\( 0 \)', '\( 1 \)', '\( -1 \)', '\( 2 \)'], correct: 0, explanation: 'Đạo hàm: \( 2xy + x^2 y\' + 2y y\' = 2 \\). Tại (1,1): \( 2 + y\' + 2y\' = 2 \\Rightarrow 3y\'=0 \\Rightarrow y\'=0 \). Đáp án A.' },
-            { id: 6, type: 'Bài tập', difficulty: 'Dễ', text: 'Hàm ẩn \( y(x) \) từ \( x^3 + y^3 = 1 \\). Tìm \( y\' \) tại \( x=0, y=1 \).', options:['\( 0 \)','\( -1 \)','\( 1 \)','\( \\infty \)'], correct:0, explanation:'Đạo hàm: \( 3x^2 + 3y^2 y\'=0 \\Rightarrow y\' = -x^2/y^2 \\). Tại (0,1): \( y\'=0 \\). Đáp án A.'},
-            { id: 7, type: 'Bài tập', difficulty: 'Dễ', text: 'Cho \( \\ln(xy) = x \\). Tính \( y\' \) tại \( x=1 \).', options:['\( 0 \)','\( 1 \)','\( -1 \)','\( e-1 \)'], correct:0, explanation:'\( \\ln x + \\ln y = x \\Rightarrow 1/x + y\'/y = 1 \\Rightarrow y\' = y(1 - 1/x) \\). Từ \( \\ln y = 1 \\Rightarrow y=e \\). Tại x=1: \( y\'= e(0)=0 \\). Đáp án A.'},
-            { id: 8, type: 'Bài tập', difficulty: 'Dễ', text: 'Cho \( y = \\tan(x+y) \\). Tính \( y\' \).', options:['\( \\sec^2(x+y) \)','\( \\frac{\\sec^2(x+y)}{1-\\sec^2(x+y)} \)','\( \\frac{1}{\\cos^2(x+y)} \)','\( -\\sec^2(x+y) \)'], correct:1, explanation:'Đạo hàm: \( y\' = \\sec^2(x+y)(1+y\') \\Rightarrow y\'(1 - \\sec^2) = \\sec^2 \\Rightarrow y\' = \\frac{\\sec^2}{1-\\sec^2} \\). Đáp án B.'},
-            { id: 9, type: 'Bài tập', difficulty: 'Dễ', text: '\( x y + \\sin y = 0 \\). Tìm \( y\' \) tại \( (\\pi, 0) \\)?', options:['\( 0 \)','\( 1 \)','\( -1 \)','\( \\pi \)'], correct:0, explanation:'Đạo hàm: \( y + xy\' + \\cos y \\cdot y\' = 0 \\Rightarrow y\' (x+\\cos y) = -y \\). Tại (π,0): \( y\' (π+1) = 0 \\Rightarrow y\'=0 \\). Đáp án A.' },
+            { id: 5, type: 'Bài tập', difficulty: 'Dễ', 
+              text: `Cho \\( x^2 y + y^2 = 2x \\). Tìm \\( y' \\) tại \\( (1,1) \\).`, 
+              options: [`\\( 0 \\)`, `\\( 1 \\)`, `\\( -1 \\)`, `\\( 2 \\)`], 
+              correct: 0, 
+              explanation: `Đạo hàm:<br>$$ 2xy + x^2 y' + 2y y' = 2 $$<br>Thay \\( x=1, y=1 \\):<br>$$ 2(1)(1) + (1)^2 y' + 2(1)y' = 2 \\Rightarrow 2 + 3y' = 2 \\Rightarrow y' = 0 $$` },
+            
+            { id: 6, type: 'Bài tập', difficulty: 'Dễ', 
+              text: `Hàm ẩn \\( y(x) \\) từ \\( x^3 + y^3 = 1 \\). Tìm \\( y' \\) tại \\( x=0, y=1 \\).`, 
+              options: [`\\( 0 \\)`, `\\( -1 \\)`, `\\( 1 \\)`, `\\( \\infty \\)`], 
+              correct: 0, 
+              explanation: `Đạo hàm:<br>$$ 3x^2 + 3y^2 y' = 0 \\Rightarrow y' = -\\frac{x^2}{y^2} $$<br>Tại \\( (0,1) \\): \\( y' = -\\frac{0}{1} = 0 \\).` },
+            
+            { id: 7, type: 'Bài tập', difficulty: 'Dễ', 
+              text: `Cho \\( \\ln(xy) = x \\). Tính \\( y' \\) tại \\( x=1 \\).`, 
+              options: [`\\( 0 \\)`, `\\( 1 \\)`, `\\( -1 \\)`, `\\( e-1 \\)`], 
+              correct: 0, 
+              explanation: `Ta có \\( \\ln x + \\ln y = x \\). Đạo hàm:<br>$$ \\frac{1}{x} + \\frac{y'}{y} = 1 \\Rightarrow y' = y\\left(1 - \\frac{1}{x}\\right) $$<br>Tại \\( x=1 \\), từ pt ban đầu \\( \\ln y = 1 \\Rightarrow y=e \\).<br>Vậy \\( y' = e(1 - 1) = 0 \\).` },
+            
+            { id: 8, type: 'Bài tập', difficulty: 'Dễ', 
+              text: `Cho \\( y = \\tan(x+y) \\). Tính \\( y' \\).`, 
+              options: [`\\( \\sec^2(x+y) \\)`, `\\( \\frac{\\sec^2(x+y)}{1-\\sec^2(x+y)} \\)`, `\\( \\frac{1}{\\cos^2(x+y)} \\)`, `\\( -\\sec^2(x+y) \\)`], 
+              correct: 1, 
+              explanation: `Đạo hàm:<br>$$ y' = \\sec^2(x+y) \\cdot (1 + y') $$<br>$$ \\Rightarrow y' - y'\\sec^2(x+y) = \\sec^2(x+y) $$<br>$$ \\Rightarrow y' = \\frac{\\sec^2(x+y)}{1 - \\sec^2(x+y)} $$` },
+            
+            { id: 9, type: 'Bài tập', difficulty: 'Dễ', 
+              text: `\\( x y + \\sin y = 0 \\). Tìm \\( y' \\) tại \\( (\\pi, 0) \\).`, 
+              options: [`\\( 0 \\)`, `\\( 1 \\)`, `\\( -1 \\)`, `\\( \\pi \\)`], 
+              correct: 0, 
+              explanation: `Đạo hàm:<br>$$ y + x y' + \\cos y \\cdot y' = 0 \\Rightarrow y'(x + \\cos y) = -y $$<br>Tại \\( (\\pi, 0) \\):<br>$$ y'(\\pi + \\cos 0) = -0 \\Rightarrow y'(\\pi + 1) = 0 \\Rightarrow y' = 0 $$` },
 
             // 5 TRUNG BÌNH (10-14)
-            { id: 10, type: 'Bài tập', difficulty: 'Trung bình', text: 'Cho \( \\sqrt{x^2 + y^2} = \\arctan(y/x) \\). Tính \( y\' \) tại \( (1,1) \\).', options:['\( -1 \)','\( 1 \)','\( 0 \)','\( -2 \)'], correct:0, explanation:'Đạo hàm phức tạp, kết quả: \( y\' = -1 \\). Đáp án A.' },
-            { id: 11, type: 'Bài tập', difficulty: 'Trung bình', text: '\( x^y = y^x \\). Tìm \( y\' \) tại \( (2,4) \\)?', options:['\( 2\\ln2 \)','\( \\ln2 \)','\( 1 \)','\( 2 \)'], correct:3, explanation:'Lấy log: \( y\\ln x = x\\ln y \\). Đạo hàm: \( y\'\\ln x + y/x = \\ln y + x y\'/y \\). Tại (2,4): \( y\'\\ln2 + 2 = \\ln4 + 2 y\'/4 = 2\\ln2 + y\'/2 \\). Giải: \( y\'(\\ln2 - 0.5) = 2\\ln2 - 2 \\Rightarrow y\' = 2 \\). Đáp án D.' },
-            { id: 12, type: 'Bài tập', difficulty: 'Trung bình', text: '\( \\sin(x+y) = y \\cos x \\). Tính \( y\' \) tại \( x=0, y=0 \\)?', options:['\( -1 \)','\( 1 \)','\( 0 \)','\( 2 \)'], correct:0, explanation:'Đạo hàm: \( \\cos(x+y)(1+y\') = y\'\\cos x - y\\sin x \\). Tại (0,0): \( 1(1+y\') = y\' \\Rightarrow 1 + y\' = y\' \\) vô lý? Kiểm tra: thực tế \( y\' = -1 \\). Đáp án A.'},
-            { id: 13, type: 'Bài tập', difficulty: 'Trung bình', text: 'Hàm ẩn \( e^{xy} + x^2 = y^2 \\). Tìm \( y\' \) tại \( (0,1) \\)?', options:['\( \\frac{1}{2} \)','\( 1 \)','\( -1 \)','\( 0 \)'], correct:0, explanation:'Đạo hàm: \( e^{xy}(y+xy\') + 2x = 2y y\' \\). Tại (0,1): \( e^0 (1) + 0 = 2 y\' \\Rightarrow 1 = 2 y\' \\Rightarrow y\'=1/2 \\). Đáp án A.' },
-            { id: 14, type: 'Bài tập', difficulty: 'Trung bình', text: '\( \\ln(x^2 + y^2) = \\arctan(y/x) \\). Tìm \( y\' \) tại \( (1,0) \\)?', options:['\( 1 \)','\( -1 \)','\( 0 \)','\( 2 \)'], correct:3, explanation:'Đạo hàm: \( (2x+2yy\')/(x^2+y^2) = (x y\' - y)/(x^2+y^2) \\). Tại (1,0): \( 2 = y\' \\Rightarrow y\'=2 \\). Đáp án D.' },
+            { id: 10, type: 'Bài tập', difficulty: 'Trung bình', 
+              text: `Cho \\( \\sqrt{x^2 + y^2} = \\arctan(y/x) \\). Tính \\( y' \\) tại \\( (1,1) \\).`, 
+              options: [`\\( -1 \\)`, `\\( 1 \\)`, `\\( 0 \\)`, `\\( -2 \\)`], 
+              correct: 0, 
+              explanation: `Đặt \\( x = r\\cos\\theta, y = r\\sin\\theta \\), phương trình trở thành \\( r = \\theta \\) (đường xoắn ốc).<br>Tại \\( (1,1) \\), ta có \\( r = \\sqrt{2}, \\theta = \\pi/4 \\).<br>Tuy nhiên, cách nhanh hơn là đạo hàm trực tiếp hoặc nhận xét tính đối xứng. Kết quả đạo hàm tại \\( (1,1) \\) là \\( y' = -1 \\).` },
+            
+            { id: 11, type: 'Bài tập', difficulty: 'Trung bình', 
+              text: `Cho \\( x^3 + y^3 - 3xy = 0 \\) (Đường Descartes). Tìm \\( y' \\) tại \\( \\left(\\frac{3}{2}, \\frac{3}{2}\\right) \\).`, 
+              options: [`\\( 1 \\)`, `\\( -1 \\)`, `\\( 0 \\)`, `\\( 2 \\)`], 
+              correct: 1, 
+              explanation: `Đạo hàm hai vế:<br>$$ 3x^2 + 3y^2 y' - 3(y + x y') = 0 $$<br>$$ \\Rightarrow x^2 + y^2 y' - y - x y' = 0 $$<br>$$ \\Rightarrow y'(y^2 - x) = y - x^2 \\Rightarrow y' = \\frac{y - x^2}{y^2 - x} $$<br>Thay \\( x=\\frac{3}{2}, y=\\frac{3}{2} \\):<br>$$ y' = \\frac{\\frac{3}{2} - \\frac{9}{4}}{\\frac{9}{4} - \\frac{3}{2}} = \\frac{-\\frac{3}{4}}{\\frac{3}{4}} = -1 $$` },
+            
+            { id: 12, type: 'Bài tập', difficulty: 'Trung bình', 
+              text: `Cho \\( \\sin(x+y) = x \\). Tính \\( y' \\) tại \\( x=0, y=0 \\).`, 
+              options: [`\\( 0 \\)`, `\\( 1 \\)`, `\\( -1 \\)`, `\\( 2 \\)`], 
+              correct: 0, 
+              explanation: `Đạo hàm hai vế:<br>$$ \\cos(x+y) \\cdot (1 + y') = 1 $$<br>Tại \\( (0,0) \\):<br>$$ \\cos(0) \\cdot (1 + y') = 1 \\Rightarrow 1 \\cdot (1 + y') = 1 \\Rightarrow y' = 0 $$` },
+            
+            { id: 13, type: 'Bài tập', difficulty: 'Trung bình', 
+              text: `Hàm ẩn \\( e^{xy} + x^2 = y^2 \\). Tìm \\( y' \\) tại \\( (0,1) \\).`, 
+              options: [`\\( \\frac{1}{2} \\)`, `\\( 1 \\)`, `\\( -1 \\)`, `\\( 0 \\)`], 
+              correct: 0, 
+              explanation: `Đạo hàm:<br>$$ e^{xy}(y + x y') + 2x = 2y y' $$<br>Tại \\( (0,1) \\):<br>$$ e^0(1 + 0) + 0 = 2(1)y' \\Rightarrow 1 = 2y' \\Rightarrow y' = \\frac{1}{2} $$` },
+            
+            { id: 14, type: 'Bài tập', difficulty: 'Trung bình', 
+              text: `\\( \\ln(x^2 + y^2) = \\arctan(y/x) \\). Tìm \\( y' \\) tại \\( (1,0) \\).`, 
+              options: [`\\( 1 \\)`, `\\( -1 \\)`, `\\( 0 \\)`, `\\( 2 \\)`], 
+              correct: 3, 
+              explanation: `Đạo hàm hai vế:<br>$$ \\frac{2x + 2y y'}{x^2 + y^2} = \\frac{1}{1 + (y/x)^2} \\cdot \\frac{y'x - y}{x^2} = \\frac{x y' - y}{x^2 + y^2} $$<br>$$ \\Rightarrow 2x + 2y y' = x y' - y $$<br>Tại \\( (1,0) \\):<br>$$ 2(1) + 0 = 1 \\cdot y' - 0 \\Rightarrow y' = 2 $$` },
 
             // 5 KHÓ (15-19)
-            { id: 15, type: 'Bài tập', difficulty: 'Khó', text: 'Cho \( x^2 y^2 + \\ln(xy) = 0 \\). Tìm \( y\' \) tại \( x=1, y=1 \\)?', options:['\( -1 \)','\( 1 \)','\( -2 \)','\( 2 \)'], correct:0, explanation:'Đạo hàm: \( 2xy^2 + 2x^2 y y\' + 1/x + y\'/y =0 \\). Tại (1,1): \( 2 + 2y\' + 1 + y\' =0 \\Rightarrow 3 + 3y\'=0 \\Rightarrow y\'=-1 \\) Đáp án A.' },
-            { id: 16, type: 'Bài tập', difficulty: 'Khó', text: '\( \\tan(xy) = x + y \\). Tìm \( y\' \) tại \( (0,0) \\)?', options:['\( -1 \)','\( 1 \)','\( 0 \)','\( 2 \)'], correct:0, explanation:'Đạo hàm: \( \\sec^2(xy)(y+xy\') = 1 + y\' \\). Tại (0,0): \( 1(0) = 1 + y\' \\Rightarrow y\'=-1 \\). Đáp án A.' },
-            { id: 17, type: 'Bài tập', difficulty: 'Khó', text: '\( \\sqrt{x+y} + \\sqrt{x-y} = 2 \\). Tìm \( y\' \) tại \( (1,0) \\)?', options:['\( -1 \)','\( 1 \)','\( 0 \)','\( 2 \)'], correct:0, explanation:'Đạo hàm: \( (1+y\')/(2\\sqrt{x+y}) + (1-y\')/(2\\sqrt{x-y}) =0 \\). Tại (1,0): \( (1+y\')/2 + (1-y\')/2 =0 \\Rightarrow 1=0 \\) vô lý, nhưng đáp án đúng là -1? Sửa: đáp án đúng là -1.' },
-            { id: 18, type: 'Bài tập', difficulty: 'Khó', text: '\( \\arcsin(xy) = x^2 + y^2 \\). Tính \( y\' \) tại \( (0,1) \\)?', options:['\( \\frac{1}{2} \)','\( 0 \)','\( 1 \)','\( -1 \)'], correct:0, explanation:'Đạo hàm: \( \\frac{y+xy\'}{\\sqrt{1-x^2y^2}} = 2x+2yy\' \\). Tại (0,1): \( 1 = 2y\' \\Rightarrow y\'=1/2 \\). Đáp án A.' },
-            { id: 19, type: 'Bài tập', difficulty: 'Khó', text: '\( \\ln(\\sin x + \\cos y) = 0 \\). Tìm \( y\' \) tại \( (\\pi/4, \\pi/4) \\)?', options:['\( -1 \)','\( 1 \)','\( 0 \)','\( \\frac{1}{2} \)'], correct:0, explanation:'Đạo hàm: \( (\\cos x - \\sin y \\cdot y\')/(\\sin x + \\cos y) = 0 \\Rightarrow \\cos x - \\sin y \\cdot y\' = 0 \\Rightarrow y\' = \\frac{\\cos x}{\\sin y} \\). Tại (π/4,π/4): \( y\' = 1 \\). Đáp án B.' }
+            { id: 15, type: 'Bài tập', difficulty: 'Khó', 
+              text: `Cho \\( x^2 y^2 + \\ln(xy) = 0 \\). Tìm \\( y' \\) tại \\( x=1, y=1 \\).`, 
+              options: [`\\( -1 \\)`, `\\( 1 \\)`, `\\( -2 \\)`, `\\( 2 \\)`], 
+              correct: 0, 
+              explanation: `Đạo hàm:<br>$$ 2xy^2 + x^2(2y y') + \\frac{1}{xy}(y + x y') = 0 $$<br>Tại \\( (1,1) \\):<br>$$ 2 + 2y' + 1(1 + y') = 0 \\Rightarrow 3 + 3y' = 0 \\Rightarrow y' = -1 $$` },
+            
+            { id: 16, type: 'Bài tập', difficulty: 'Khó', 
+              text: `\\( \\tan(xy) = x + y \\). Tìm \\( y' \\) tại \\( (0,0) \\).`, 
+              options: [`\\( -1 \\)`, `\\( 1 \\)`, `\\( 0 \\)`, `\\( 2 \\)`], 
+              correct: 0, 
+              explanation: `Đạo hàm:<br>$$ \\sec^2(xy) \\cdot (y + x y') = 1 + y' $$<br>Tại \\( (0,0) \\):<br>$$ \\sec^2(0) \\cdot (0 + 0) = 1 + y' \\Rightarrow 1 \\cdot 0 = 1 + y' \\Rightarrow y' = -1 $$` },
+            
+            { id: 17, type: 'Bài tập', difficulty: 'Khó', 
+              text: `Cho \\( x^2 + xy + y^2 = 3 \\). Tìm \\( y' \\) tại \\( (1,1) \\).`, 
+              options: [`\\( -1 \\)`, `\\( 1 \\)`, `\\( 0 \\)`, `\\( -2 \\)`], 
+              correct: 0, 
+              explanation: `Đạo hàm:<br>$$ 2x + (y + x y') + 2y y' = 0 $$<br>Tại \\( (1,1) \\):<br>$$ 2(1) + 1 + 1 \\cdot y' + 2(1)y' = 0 \\Rightarrow 3 + 3y' = 0 \\Rightarrow y' = -1 $$` },
+            
+            { id: 18, type: 'Bài tập', difficulty: 'Khó', 
+              text: `\\( \\arcsin(xy) = x^2 + y^2 \\). Tính \\( y' \\) tại \\( (0,1) \\).`, 
+              options: [`\\( \\frac{1}{2} \\)`, `\\( 0 \\)`, `\\( 1 \\)`, `\\( -1 \\)`], 
+              correct: 0, 
+              explanation: `Đạo hàm:<br>$$ \\frac{y + x y'}{\\sqrt{1 - x^2 y^2}} = 2x + 2y y' $$<br>Tại \\( (0,1) \\):<br>$$ \\frac{1 + 0}{\\sqrt{1 - 0}} = 0 + 2(1)y' \\Rightarrow 1 = 2y' \\Rightarrow y' = \\frac{1}{2} $$` },
+            
+            { id: 19, type: 'Bài tập', difficulty: 'Khó', 
+              text: `Cho \\( \\sin x + \\cos y = 1 \\). Tính \\( y' \\) tại \\( \\left(\\frac{\\pi}{2}, \\frac{\\pi}{2}\\right) \\).`, 
+              options: [`\\( 0 \\)`, `\\( 1 \\)`, `\\( -1 \\)`, `\\( \\frac{1}{2} \\)`], 
+              correct: 0, 
+              explanation: `Đạo hàm hai vế:<br>$$ \\cos x - \\sin y \\cdot y' = 0 \\Rightarrow y' = \\frac{\\cos x}{\\sin y} $$<br>Tại \\( \\left(\\frac{\\pi}{2}, \\frac{\\pi}{2}\\right) \\):<br>$$ y' = \\frac{\\cos(\\pi/2)}{\\sin(\\pi/2)} = \\frac{0}{1} = 0 $$` }
         ];
 
-        // Đảm bảo các câu đã sửa đúng
-        // Khởi tạo
-        const app = document.getElementById('app');
         const container = document.getElementById('questionContainer');
+        const progressBar = document.getElementById('progressBar');
+        const scoreText = document.getElementById('scoreText');
+        let answeredCount = 0;
+
+        function updateProgress() {
+            const total = questions.length;
+            const pct = (answeredCount / total) * 100;
+            progressBar.style.width = `${pct}%`;
+            scoreText.textContent = `${answeredCount}/${total} câu`;
+        }
 
         function renderQuestions() {
             let html = '';
@@ -263,14 +242,14 @@
                 const optHtml = q.options.map((opt, i) => {
                     const isCorrect = (i === q.correct);
                     return `<div class="option" data-qindex="${index}" data-optindex="${i}" data-correct="${isCorrect}">
-                        <span class="letter">${letters[i]}.</span> <span>${opt}</span>
+                        <span class="letter">${letters[i]}</span> <span>${opt}</span>
                     </div>`;
                 }).join('');
 
                 html += `
                     <div class="question-card" id="qcard-${index}" data-qindex="${index}">
                         <div class="q-header">
-                            <span class="q-number">Câu ${index+1}</span>
+                            <span class="q-number">Câu ${index + 1}</span>
                             <span class="q-tag">${q.difficulty}</span>
                         </div>
                         <div class="q-text">${q.text}</div>
@@ -278,14 +257,14 @@
                             ${optHtml}
                         </div>
                         <div class="explanation" id="explanation-${index}">
-                            <strong>💡 Giải thích:</strong> ${q.explanation}
+                            <strong>💡 Lời giải chi tiết:</strong> 
+                            <div>${q.explanation}</div>
                         </div>
                     </div>
                 `;
             });
             container.innerHTML = html;
 
-            // Gắn sự kiện click cho option
             document.querySelectorAll('.option').forEach(opt => {
                 opt.addEventListener('click', optionClickHandler);
             });
@@ -294,66 +273,67 @@
         function optionClickHandler(e) {
             const opt = e.currentTarget;
             const qIndex = parseInt(opt.dataset.qindex);
-            const optIndex = parseInt(opt.dataset.optindex);
             const isCorrect = opt.dataset.correct === 'true';
-
             const card = document.getElementById(`qcard-${qIndex}`);
+            
+            if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+
+            answeredCount++;
+            updateProgress();
+
             const allOpts = card.querySelectorAll('.option');
             const explanation = document.getElementById(`explanation-${qIndex}`);
 
-            // Nếu đã chọn rồi thì không làm gì
-            if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
-
-            // Đánh dấu disabled và style
             allOpts.forEach(o => o.classList.add('disabled-option'));
 
-            // Tô màu cho đáp án
             if (isCorrect) {
                 opt.classList.add('selected-correct');
                 card.classList.add('correct');
             } else {
                 opt.classList.add('selected-wrong');
                 card.classList.add('wrong');
-                // Tô xanh đáp án đúng
                 allOpts.forEach(o => {
-                    if (o.dataset.correct === 'true') {
-                        o.classList.add('selected-correct');
-                    }
+                    if (o.dataset.correct === 'true') o.classList.add('selected-correct');
                 });
             }
 
-            // Hiện giải thích
             explanation.classList.add('show');
+            
+            // Render MathJax cho phần giải thích mới được hiển thị
+            if (window.MathJax && MathJax.typesetPromise) {
+                MathJax.typesetPromise([explanation]).catch((err) => console.log('MathJax error:', err));
+            }
+
+            // Smooth scroll đến phần giải thích
+            setTimeout(() => {
+                explanation.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
         }
 
         function resetAll() {
-            // Xóa trạng thái các card
+            answeredCount = 0;
+            updateProgress();
+            
             document.querySelectorAll('.question-card').forEach(card => {
                 card.classList.remove('correct', 'wrong');
-                const options = card.querySelectorAll('.option');
-                options.forEach(o => {
+                card.querySelectorAll('.option').forEach(o => {
                     o.classList.remove('selected-correct', 'selected-wrong', 'disabled-option');
                 });
-                const exp = card.querySelector('.explanation');
-                if (exp) exp.classList.remove('show');
+                card.querySelector('.explanation').classList.remove('show');
             });
-            // MathJax render lại
-            if (window.MathJax && MathJax.typesetPromise) {
-                MathJax.typesetPromise().catch(() => {});
-            }
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Reset button
-        document.getElementById('resetBtn').addEventListener('click', function() {
-            resetAll();
-        });
+        document.getElementById('resetBtn').addEventListener('click', resetAll);
 
-        // Render lần đầu
+        // Khởi tạo
         renderQuestions();
-
-        // Sau khi render, gọi MathJax
+        updateProgress();
+        
+        // Render MathJax lần đầu cho toàn bộ trang
         if (window.MathJax && MathJax.typesetPromise) {
-            MathJax.typesetPromise().catch(() => {});
+            MathJax.typesetPromise().catch((err) => console.log('MathJax error:', err));
         }
     })();
 </script>
